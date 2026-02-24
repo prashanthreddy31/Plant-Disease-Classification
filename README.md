@@ -65,8 +65,7 @@ PlantDisease-Classification/
 │
 ├── outputs/
 │   ├── models/
-│   ├── plots/
-│   └── class_names.pth
+│   └──plots/
 │
 └── README.md
 ```
@@ -118,9 +117,9 @@ The project includes a **production-level training pipeline** with:
 
 | Model        | Accuracy |
 | ------------ | -------- |
-| CNN          | ~92%     |
-| EfficientNet | ~97%     |
-| DeiT         | ~98%     |
+| CNN          | ~83.88%     |
+| EfficientNet | ~91.63%     |
+| DeiT         | ~93.73%     |
 
 *(Results may vary depending on training setup)*
 
