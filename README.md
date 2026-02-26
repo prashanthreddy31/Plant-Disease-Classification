@@ -44,7 +44,7 @@ https://www.kaggle.com/datasets/emmarex/plantdisease
 PlantDisease-Classification/
 │
 ├── train_pipeline.py
-├── predict_pipeline.py
+├── Predict.py
 │
 ├── src/
 │   ├── config.py
@@ -146,7 +146,7 @@ python train_pipeline.py
 ### 3️⃣ Run Prediction
 
 ```bash
-python predict_pipeline.py --image sample.jpg --model deit
+python Predict.py --image sample.jpg --model deit
 ```
 
 Available models:
