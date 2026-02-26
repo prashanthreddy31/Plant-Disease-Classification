@@ -5,6 +5,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from src.early_stopping import EarlyStopping
 from src.config import config
 from tqdm import tqdm
+import os
 
 epochs = config.EPOCHS
 
@@ -15,9 +16,16 @@ def train_model(model, train_loader, val_loader, device, config):
 
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=3, factor=0.3)
 
+    os.makedirs(config.MODEL_SAVE_DIR, exist_ok=True)
+
+    model_save_path = os.path.join(
+        config.MODEL_SAVE_DIR,
+        f"best_model_{model}.pth"
+    )
+
     early_stopping = EarlyStopping(
         patience=config.PATIENCE,
-        save_path=config.MODEL_SAVE_PATH
+        save_path=model_save_path
     )
 
     model.to(device)
