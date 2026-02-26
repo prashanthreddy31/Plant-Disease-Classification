@@ -4,6 +4,9 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from src.early_stopping import EarlyStopping
 from src.config import config
+from tqdm import tqdm
+
+epochs = config.EPOCHS
 
 def train_model(model, train_loader, val_loader, device, config):
 
@@ -14,7 +17,7 @@ def train_model(model, train_loader, val_loader, device, config):
 
     early_stopping = EarlyStopping(
         patience=config.PATIENCE,
-        path=config.MODEL_SAVE_PATH
+        save_path=config.MODEL_SAVE_PATH
     )
 
     model.to(device)
@@ -32,20 +35,24 @@ def train_model(model, train_loader, val_loader, device, config):
         model.train()
         running_loss = 0
         running_corrects = 0
+        progress_bar = tqdm(enumerate(train_loader), desc=f"Epoch {epoch+1}/{epochs}", total=len(train_loader))
 
-        for images, labels in train_loader:
+        for batch_idx, (images, labels) in progress_bar:
             images, labels = images.to(device), labels.to(device)
 
-            optimizer.zero_grad()
+            # Forward pass
             outputs = model(images)
-
             loss = criterion(outputs, labels)
+
+            # Backward pass
+            optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            train_loss += loss.item()
+            running_loss += loss.item()
             _, preds = torch.max(outputs, 1)
             running_corrects+= torch.sum(preds == labels.data)
+            progress_bar.set_postfix({'Train Loss': loss.item()})
 
         epoch_loss = running_loss / len(train_loader)
         epoch_acc = running_corrects.double() / len(train_loader)

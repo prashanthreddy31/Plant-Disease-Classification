@@ -1,5 +1,5 @@
 class config:
-    DATA_DIR = "data/plantvillage"
+    DATA_DIR = "D:\_RSSA HCP057\svp\Projects\PlantVillage classification\Data"
     BATCH_SIZE = 32
     LR = 0.001
     EPOCHS = 30

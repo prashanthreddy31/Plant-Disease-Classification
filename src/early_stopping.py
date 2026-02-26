@@ -1,7 +1,7 @@
 import torch
 
 class EarlyStopping:
-    def __init__(self, patience =3, min_delta=0, save_path="outputs/models/best_model.pth"):
+    def __init__(self, patience =3, min_delta=0, save_path="best_model.pth"):
         self.patience = patience
         self.min_delta = min_delta
         self.save_path = save_path

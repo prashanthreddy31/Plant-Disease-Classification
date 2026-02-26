@@ -52,8 +52,51 @@ def load_images(directory_root):
     print(f"Total images: {len(image_list)}")
     return image_list, label_list
 
+def get_transforms(model_name):
 
-def prepare_data(directory_root, image_size=(256, 256), batch_size=32, test_size=0.3, valid_ratio=0.5, random_state=42):
+    # Same size for CNN & EfficientNet
+    if model_name.lower() in ["cnn", "efficientnet"]:
+        image_size = (224, 224)
+
+    # Different size for DeiT
+    elif model_name.lower() == "deit":
+        image_size = (384, 384)   # example different size
+
+    else:
+        raise ValueError("Unsupported model name")
+
+    # TRAIN TRANSFORM
+    train_transform = transforms.Compose([
+        transforms.Resize(image_size),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        transforms.RandomRotation(30),
+        transforms.ColorJitter(
+            brightness=0.1,
+            contrast=0.1,
+            saturation=0.1,
+            hue=0.1
+        ),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ])
+
+    # VALID / TEST TRANSFORM
+    valid_test_transform = transforms.Compose([
+        transforms.Resize(image_size),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ])
+
+    return train_transform, valid_test_transform
+
+def prepare_data(directory_root, train_transform, valid_test_transform, batch_size=32, test_size=0.3, valid_ratio=0.5, random_state=42):
     """Prepare data loaders and label encoder"""
     # Load images and labels
     image_paths, labels = load_images(directory_root)
@@ -62,13 +105,15 @@ def prepare_data(directory_root, image_size=(256, 256), batch_size=32, test_size
     label_encoder = LabelEncoder()
     labels_encoded = label_encoder.fit_transform(labels)
 
+    os.makedirs("outputs", exist_ok=True)
+
     # Save label encoder for inference
-    with open('label_encoder.pkl', 'wb') as f:
+    with open('outputs/label_encoder.pkl', 'wb') as f:
         pickle.dump(label_encoder, f)
 
     # Save class names for reference
     class_names = list(label_encoder.classes_)
-    with open('class_names.json', 'w') as f:
+    with open('outputs/class_names.json', 'w') as f:
         json.dump(class_names, f)
 
     # Train, validation, and test splits
@@ -82,30 +127,6 @@ def prepare_data(directory_root, image_size=(256, 256), batch_size=32, test_size
     print(f"Training samples: {len(train_paths)}")
     print(f"Validation samples: {len(valid_paths)}")
     print(f"Test samples: {len(test_paths)}")
-
-    # Data Transformations
-    train_transform = transforms.Compose([
-        transforms.Resize(image_size),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomVerticalFlip(),
-        transforms.RandomRotation(30),
-        transforms.ColorJitter(
-            brightness=0.1, contrast=0.1, saturation=0.1, hue=0.1),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
-                             0.229, 0.224, 0.225])
-    ])
-
-    valid_test_transform = transforms.Compose([
-        transforms.Resize(image_size),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[
-                             0.229, 0.224, 0.225])
-    ])
-
-    # Save image transformation for inference
-    with open('inference_transform.pkl', 'wb') as f:
-        pickle.dump(valid_test_transform, f)
 
     # Create datasets with appropriate transformations
     train_dataset = PlantDiseaseDataset(
@@ -123,4 +144,4 @@ def prepare_data(directory_root, image_size=(256, 256), batch_size=32, test_size
     test_loader = DataLoader(
         test_dataset, batch_size=batch_size, shuffle=False)
 
-    return train_loader, valid_loader, test_loader, len(class_names)
+    return train_loader, valid_loader, test_loader, class_names

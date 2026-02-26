@@ -7,3 +7,5 @@ scikit-learn
 pillow
 tqdm
 timm
+torch
+torchvision

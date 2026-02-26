@@ -113,13 +113,13 @@ The project includes a **production-level training pipeline** with:
 
 ---
 
-## 📊 Model Performance Comparison
+## 📊 Model Performance Comparison on Test Dataset
 
 | Model        | Accuracy |
 | ------------ | -------- |
-| CNN          | ~83.88%     |
-| EfficientNet | ~91.63%     |
-| DeiT         | ~93.73%     |
+| CNN          | ~85.85%     |
+| EfficientNet | ~91.83%     |
+| DeiT         | ~93.54%     |
 
 *(Results may vary depending on training setup)*
 
